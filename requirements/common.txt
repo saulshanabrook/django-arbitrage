@@ -1,0 +1,4 @@
+-r admin.txt
+
+Django==1.4
+South==0.7.5
