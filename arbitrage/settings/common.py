@@ -1,17 +1,10 @@
-import os
+from os import path
 
 from django.conf.global_settings import *
 
+import arbitrage
 
-DIRNAME = os.path.dirname(__file__)
-
-########
-#Arbitrage
-########
-
-INSTALLED_APPS = (
-
-  )
+SITE_ROOT = path.dirname(path.realpath(arbitrage.__file__))
 
 
 ########
@@ -40,7 +33,7 @@ INSTALLED_APPS += (
   )
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(DIRNAME, '../static/')
+STATIC_ROOT = path.normpath(path.join(SITE_ROOT, '../static/'))
 
 
 #Admin
