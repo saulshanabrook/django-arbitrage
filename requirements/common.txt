@@ -1,8 +1,9 @@
 Django==1.4
 South==0.7.5
-
+beautifulsoup4==4.1.1
+lxml==2.3.4
+requests==0.13.3
 ##
 #Admin
 ##
 git+git://github.com/sehmaschine/django-grappelli.git@grappelli_2_4
-git+git://github.com/lincolnloop/django-smart-selects.git@dbe42ad4604d132ce72adc3ecd0de807a9766094
