@@ -6,6 +6,9 @@ import arbitrage
 
 SITE_ROOT = path.dirname(path.realpath(arbitrage.__file__))
 
+INSTALLED_APPS = (
+    'arbitrage.apps.stocks',
+)
 
 ########
 #External Packages
@@ -15,8 +18,7 @@ INSTALLED_APPS += (
     'grappelli',
   )
 
-GRAPPELLI_ADMIN_TITLE = 'arbitrage'
-
+GRAPPELLI_ADMIN_TITLE = 'Arbitrage'
 
 ########
 #Django
@@ -30,6 +32,7 @@ INSTALLED_APPS += (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.admin',
+    'django.contrib.staticfiles',
   )
 
 STATIC_URL = '/static/'
