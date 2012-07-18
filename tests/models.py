@@ -7,10 +7,6 @@ from .factories import StockIntradeFactory
 
 
 class StockTestCase(TestCase):
-    def test_convert_string_decimal(self):
-        returned = Stock.string_decimal('53.3')
-        self.assertEqual(returned, Decimal('.533'))
-
     def test_intrade_fields_limited(self):
         fields = ['symbol', 'last_trade_price', 'bid']
         returned = Stock.intrade_fields(743474, fields)

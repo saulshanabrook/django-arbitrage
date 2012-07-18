@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from bs4 import BeautifulSoup, SoupStrainer
 import requests
 
@@ -22,8 +24,7 @@ class Stock(models.Model):
         return '{} on {}'.format(self.symbol, self.site)
 
     def save(self, *args, **kwargs):
-        # If symbol already saved, don't sync that
-        self = self.sync(self)
+        self = self.sync()
         super(Stock, self).save(*args, **kwargs)
 
     def clean(self):
@@ -31,7 +32,6 @@ class Stock(models.Model):
         if self.site == 'intrade' and not self.intrade_id:
             raise ValidationError('Intrade stocks must have an ID')
 
-    @staticmethod
     def sync(self, fields=['symbol', 'last_trade', 'bid', 'ask']):
         """
         Update specified fields in this stock from the marketplace.
@@ -41,8 +41,8 @@ class Stock(models.Model):
         self.__dict__.update(**updated_fields)
         return self
 
-    @classmethod
-    def intrade_fields(obj, intrade_id, fields):
+    @staticmethod
+    def intrade_fields(intrade_id, fields):
         """
         Given an intrade_id, and the fields to sync, it will return a dictionary
         of fields with their values
@@ -66,29 +66,47 @@ class Stock(models.Model):
             if field == 'symbol':
                 returned_items[field] = tag.text
             elif field == 'last_trade':
-                returned_items[field] = obj.string_decimal(tag['lstTrdPrc'])
+                returned_items[field] = Decimal(tag['lstTrdPrc']) / Decimal(100)
             elif field == 'bid' or 'ask':
-                returned_items[field] = obj.string_decimal(tag['price'])
+                returned_items[field] = Decimal(tag['price']) / Decimal(100)
         return returned_items
 
-    @staticmethod
-    def string_decimal(number_string):
+
+class Group(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+    stocks = models.ManyToManyField(Stock, through='StockGroup')
+    completion_date = models.DateField()
+    greatest_difference = models.DecimalField(max_digits=3, decimal_places=3)
+    apr = models.DecimalField(max_digits=5, decimal_places=5)
+
+    def __unicode__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.sync_stocks(['bid', 'ask'])
+        #self.greatest_difference = self.find_greatest_difference()
+        super(Group, self).save(*args, **kwargs)
+
+    def sync_stocks(self, *args, **kwargs):
         """
-        Converts a string to a decimal number percent
-        '1' -> .01
-        '50' -> .50
-        '100' -> 1.00
+        Sync all the stocks in the group
+        If 'fields' keyword is provided, will only sync those fields
         """
-        from decimal import Decimal
-        return Decimal(number_string) / Decimal(100)
+        for stock in self.stocks.all():
+            stock.sync(*args, **kwargs)
+
+    def find_greatest_difference(self):
+        pass
 
 
 class StockGroup(models.Model):
-    stocks = models.ManyToManyField(Stock, through='StockGroupRelationship')
-    completion_date = models.DateField()
-
-
-class StockGroupRelationship(models.Model):
     stock = models.ForeignKey(Stock, unique=True)
-    group = models.ForeignKey(StockGroup)
-    side_one = models.BooleanField()
+    group = models.ForeignKey(Group, related_name='stock_group')
+    other_side = models.BooleanField()
+    lowest = models.BooleanField()
+    highest = models.BooleanField()
+
+    def save(self, *args, **kwargs):
+        self.sync_stocks(['bid', 'ask'])
+        super(Group, self).save(*args, **kwargs)
+
