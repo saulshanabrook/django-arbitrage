@@ -1,5 +1,3 @@
-import sys
-
 from .common import *
 
 
@@ -36,6 +34,3 @@ DEBUG_TOOLBAR_CONFIG = {
 TEST_RUNNER = 'discover_runner.DiscoverRunner'
 TEST_DISCOVER_TOP_LEVEL = path.normpath(path.join(SITE_ROOT, '..'))
 TEST_DISCOVER_ROOT = path.join(TEST_DISCOVER_TOP_LEVEL, 'tests')
-TEST_DISCOVER_PATTERN = '*.py'
-if 'test' in sys.argv:
-    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
