@@ -12,6 +12,7 @@ Branching model is partly adapted from [nvie](http://nvie.com/posts/a-successful
 7. Apply South migrations: `./manage.py migrate`
 8. _Optional:_ Run local server: `./manage.py runserver`
 ##Install on Heroku
+
     heroku addons:add newrelic:standard
     heroku addons:add memcachier:dev
     heroku addons:add heroku-postgresql:dev

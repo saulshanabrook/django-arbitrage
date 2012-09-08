@@ -44,6 +44,39 @@
         }
     }, 
     {
+        "pk": 5, 
+        "model": "stocks.stock", 
+        "fields": {
+            "intrade_id": 756107, 
+            "symbol": "DEM.ELEC.COLLEGE.270+", 
+            "selling": "0.598", 
+            "site": "intrade", 
+            "buying": "0.581"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "stocks.stock", 
+        "fields": {
+            "intrade_id": 756108, 
+            "symbol": "DEM.ELEC.COLLEGE.280+", 
+            "selling": "0.584", 
+            "site": "intrade", 
+            "buying": "0.525"
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "stocks.stock", 
+        "fields": {
+            "intrade_id": 756135, 
+            "symbol": "REP.ELEC.COLLEGE.270+", 
+            "selling": "0.451", 
+            "site": "intrade", 
+            "buying": "0.365"
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "stocks.group", 
         "fields": {
@@ -85,6 +118,24 @@
             "group": 1, 
             "other_side": true, 
             "stock": 4
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "stocks.stockgroup", 
+        "fields": {
+            "group": 1, 
+            "other_side": false, 
+            "stock": 5
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "stocks.stockgroup", 
+        "fields": {
+            "group": 1, 
+            "other_side": true, 
+            "stock": 7
         }
     }
 ]
