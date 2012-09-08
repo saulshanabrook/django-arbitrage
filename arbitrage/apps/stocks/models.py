@@ -47,16 +47,16 @@ class Group(models.Model):
         return self.name
 
     @property
-    def lowest_buy(self):
-        return min(self.stockgroups.all(), key=lambda g: g.buying).buying
+    def highest_buy(self):
+        return max(self.stockgroups.all(), key=lambda g: g.buying)
 
     @property
-    def highest_sell(self):
-        return max(self.stockgroups.all(), key=lambda g: g.selling).selling
+    def lowest_sell(self):
+        return min(self.stockgroups.all(), key=lambda g: g.selling)
 
     @property
     def greatest_difference(self):
-        return self.highest_sell - self.lowest_buy
+        return self.highest_buy.buying - self.lowest_sell.selling
 
     @property
     def apr(self):
@@ -68,6 +68,9 @@ class StockGroup(models.Model):
     stock = models.ForeignKey(Stock, unique=True, related_name='stockgroup')
     group = models.ForeignKey(Group, related_name='stockgroups')
     other_side = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return '{} in {}'.format(self.stock, self.group)
 
     @property
     def buying(self):

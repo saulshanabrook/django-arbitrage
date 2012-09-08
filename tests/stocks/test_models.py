@@ -45,6 +45,6 @@ class GroupTestCase(TestCase):
                                     stock__selling=Decimal(.35),
                                     other_side=True,
                                     group=group)
-        self.assertEqual(group.lowest_buy, Decimal('.65'))
-        self.assertEqual(group.highest_sell, Decimal('.8'))
-        self.assertEqual(group.greatest_difference, Decimal('.15'))
+        self.assertEqual(group.highest_buy.buying, Decimal('.85'))
+        self.assertEqual(group.lowest_sell.selling, Decimal('.6'))
+        self.assertEqual(group.greatest_difference, Decimal('.25'))

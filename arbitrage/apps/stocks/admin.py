@@ -18,7 +18,8 @@ class StockGroupInline(admin.TabularInline):
 
 class GroupAdmin(admin.ModelAdmin):
     inlines = (StockGroupInline,)
-    list_display = ['name', 'completion_date', 'greatest_difference', 'apr']
+    list_display = ['name', 'completion_date', 'greatest_difference', 'apr',
+                    'highest_buy', 'lowest_sell']
     actions = ['sync_stocks']
 
     def sync_stocks(self, request, queryset):
