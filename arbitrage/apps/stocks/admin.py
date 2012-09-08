@@ -3,8 +3,12 @@ from .models import Stock, Group, StockGroup
 
 
 class StockAdmin(admin.ModelAdmin):
-    readonly_fields = ('symbol', 'last_trade', 'bid', 'ask')
-    list_display = ('symbol', 'site', 'last_trade')
+    readonly_fields = ('symbol', 'buying', 'selling')
+    list_display = ('symbol', 'site', 'buying', 'selling')
+
+    def save_model(self, request, obj, form, change):
+        obj.sync()
+        obj.save()
 
 
 class StockGroupInline(admin.TabularInline):
@@ -14,5 +18,6 @@ class StockGroupInline(admin.TabularInline):
 
 class GroupAdmin(admin.ModelAdmin):
     inlines = (StockGroupInline,)
+
 admin.site.register(Stock, StockAdmin)
 admin.site.register(Group, GroupAdmin)

@@ -1,10 +1,9 @@
-from decimal import Decimal
-
-from bs4 import BeautifulSoup, SoupStrainer
-import requests
+import datetime
 
 from django.db import models
 from django.core.exceptions import ValidationError
+
+from . import api
 
 
 class Stock(models.Model):
@@ -16,97 +15,64 @@ class Stock(models.Model):
     intrade_id = models.IntegerField(unique=True, null=True, blank=True)
     # Not sure yet best way to identify IEM trades. Maybe an ID and group number
     symbol = models.SlugField(unique=True)
-    last_trade = models.DecimalField(max_digits=3, decimal_places=3)
-    bid = models.DecimalField(max_digits=3, decimal_places=3)
-    ask = models.DecimalField(max_digits=3, decimal_places=3)
+    buying = models.DecimalField(max_digits=3, decimal_places=3, null=True,
+                               blank=True)
+    selling = models.DecimalField(max_digits=3, decimal_places=3, null=True,
+                              blank=True)
 
     def __unicode__(self):
         return '{} on {}'.format(self.symbol, self.site)
-
-    def save(self, *args, **kwargs):
-        self = self.sync()
-        super(Stock, self).save(*args, **kwargs)
 
     def clean(self):
         #Require intrade_id if the stock is on intrade
         if self.site == 'intrade' and not self.intrade_id:
             raise ValidationError('Intrade stocks must have an ID')
 
-    def sync(self, fields=['symbol', 'last_trade', 'bid', 'ask']):
+    def sync(self):
         """
-        Update specified fields in this stock from the marketplace.
+        Update this stock from the marketplace.
         """
-        if self.site == 'intrade':
-            updated_fields = self.intrade_fields(self.intrade_id, fields)
-        self.__dict__.update(**updated_fields)
-        return self
-
-    @staticmethod
-    def intrade_fields(intrade_id, fields):
-        """
-        Given an intrade_id, and the fields to sync, it will return a dictionary
-        of fields with their values
-        """
-        URL = 'http://api.intrade.com/jsp/XML/MarketData/ContractBookXML.jsp?'
-        r = requests.get('{}id={}&depth=1'.format(URL, intrade_id))
-        # Only parse the xml tags corresponding to the fields
-        FIELD_TAGS = {
-            'symbol': 'symbol',
-            'last_trade': 'contractInfo',
-            'bid': 'bid',
-            'ask': 'offer',
-        }
-        # remove tags not passed
-        tags = [FIELD_TAGS[field] for field in FIELD_TAGS if field in fields]
-        soup = BeautifulSoup(r.text, 'xml',
-                             parse_only=SoupStrainer(tags))
-        returned_items = {}
-        for field in fields:
-            tag = soup.find(FIELD_TAGS[field])
-            if field == 'symbol':
-                returned_items[field] = tag.text
-            elif field == 'last_trade':
-                returned_items[field] = Decimal(tag['lstTrdPrc']) / Decimal(100)
-            elif field == 'bid' or 'ask':
-                returned_items[field] = Decimal(tag['price']) / Decimal(100)
-        return returned_items
+        data = api.get_fields(site=self.site, site_id=self.intrade_id)
+        self.symbol = data['symbol']
+        self.buying = data['buying']
+        self.selling = data['selling']
 
 
 class Group(models.Model):
     name = models.CharField(max_length=20, unique=True)
     stocks = models.ManyToManyField(Stock, through='StockGroup')
     completion_date = models.DateField()
-    greatest_difference = models.DecimalField(max_digits=3, decimal_places=3)
-    apr = models.DecimalField(max_digits=5, decimal_places=5)
 
     def __unicode__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        self.sync_stocks(['bid', 'ask'])
-        #self.greatest_difference = self.find_greatest_difference()
-        super(Group, self).save(*args, **kwargs)
+    @property
+    def lowest_buy(self):
+        return min(self.stockgroups.all(), key=lambda g: g.buying).buying
 
-    def sync_stocks(self, *args, **kwargs):
-        """
-        Sync all the stocks in the group
-        If 'fields' keyword is provided, will only sync those fields
-        """
-        for stock in self.stocks.all():
-            stock.sync(*args, **kwargs)
+    @property
+    def highest_sell(self):
+        return max(self.stockgroups.all(), key=lambda g: g.selling).selling
 
-    def find_greatest_difference(self):
-        pass
+    @property
+    def greatest_difference(self):
+        return self.highest_sell - self.lowest_buy
+
+    @property
+    def apr(self):
+        time_till = self.completion_date - datetime.date.today()
+        return self.greatest_difference * 365 / time_till.days
 
 
 class StockGroup(models.Model):
-    stock = models.ForeignKey(Stock, unique=True)
-    group = models.ForeignKey(Group, related_name='stock_group')
-    other_side = models.BooleanField()
-    lowest = models.BooleanField()
-    highest = models.BooleanField()
+    stock = models.ForeignKey(Stock, unique=True, related_name='stockgroup')
+    group = models.ForeignKey(Group, related_name='stockgroups')
+    other_side = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
-        self.sync_stocks(['bid', 'ask'])
-        super(Group, self).save(*args, **kwargs)
+    @property
+    def buying(self):
+        return 1 - self.stock.selling if self.other_side else self.stock.buying
 
+    @property
+    def selling(self):
+        return 1 - self.stock.buying if self.other_side else self.stock.selling
