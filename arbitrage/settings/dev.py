@@ -1,3 +1,5 @@
+import sys
+
 from .common import *
 
 
@@ -24,3 +26,16 @@ INSTALLED_APPS += (
     'django_extensions',
 )
 INTERNAL_IPS = ('127.0.0.1')
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False,
+}
+
+########
+#Testing
+#######
+TEST_RUNNER = 'discover_runner.DiscoverRunner'
+TEST_DISCOVER_TOP_LEVEL = path.normpath(path.join(SITE_ROOT, '..'))
+TEST_DISCOVER_ROOT = path.join(TEST_DISCOVER_TOP_LEVEL, 'tests')
+TEST_DISCOVER_PATTERN = '*.py'
+if 'test' in sys.argv:
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
