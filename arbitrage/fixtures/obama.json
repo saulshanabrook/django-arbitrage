@@ -1,0 +1,90 @@
+[
+    {
+        "pk": 1, 
+        "model": "stocks.stock", 
+        "fields": {
+            "intrade_id": 743474, 
+            "symbol": "2012.PRES.OBAMA", 
+            "selling": "0.58", 
+            "site": "intrade", 
+            "buying": "0.575"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "stocks.stock", 
+        "fields": {
+            "intrade_id": 743475, 
+            "symbol": "2012.PRES.ROMNEY", 
+            "selling": "0.426", 
+            "site": "intrade", 
+            "buying": "0.42"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "stocks.stock", 
+        "fields": {
+            "intrade_id": 639648, 
+            "symbol": "PRESIDENT.DEM.2012", 
+            "selling": "0.579", 
+            "site": "intrade", 
+            "buying": "0.572"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "stocks.stock", 
+        "fields": {
+            "intrade_id": 639649, 
+            "symbol": "PRESIDENT.REP.2012", 
+            "selling": "0.426", 
+            "site": "intrade", 
+            "buying": "0.425"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "stocks.group", 
+        "fields": {
+            "completion_date": "2012-11-08", 
+            "name": "Obama"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "stocks.stockgroup", 
+        "fields": {
+            "group": 1, 
+            "other_side": false, 
+            "stock": 1
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "stocks.stockgroup", 
+        "fields": {
+            "group": 1, 
+            "other_side": true, 
+            "stock": 2
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "stocks.stockgroup", 
+        "fields": {
+            "group": 1, 
+            "other_side": false, 
+            "stock": 3
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "stocks.stockgroup", 
+        "fields": {
+            "group": 1, 
+            "other_side": true, 
+            "stock": 4
+        }
+    }, 
+]
