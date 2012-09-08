@@ -17,4 +17,4 @@ Branching model is partly adapted from [nvie](http://nvie.com/posts/a-successful
     heroku addons:add heroku-postgresql:dev
     heroku config:add DJANGO_SETTINGS_MODULE=arbitrage.settings.prod SECRET_KEY=$SECRET_KEY
     heroku pg:promote *db_name*
-    heroku run './manage.py syncdb --noinput && ./manage.py migrate'
+    heroku run './manage.py syncdb --noinput ; ./manage.py migrate'
